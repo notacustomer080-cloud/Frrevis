@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FRrevis</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f7f7f2;--card:#fff;--text:#25323f;--muted:#6b7280;--line:#e3e7df;--green:#58cc02;--green2:#46a302;--blue:#1cb0f6;--yellow:#ffc800;--red:#ff4b4b;--soft:#eefbe7;--shadow:0 8px 0 #d9ded3}
+[data-theme=dark]{--bg:#101820;--card:#182331;--text:#f4f7fb;--muted:#a8b3c0;--line:#2c3a4a;--green:#58cc02;--green2:#46a302;--blue:#1cb0f6;--yellow:#ffc800;--red:#ff6b6b;--soft:#20351f;--shadow:0 8px 0 #0b1118}
+body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app{display:grid;grid-template-columns:245px 1fr;min-height:100vh}
+.sidebar{background:var(--card);border-right:2px solid var(--line);padding:22px 16px;position:sticky;top:0;height:100vh}
+.brand{font-size:30px;font-weight:950;color:var(--green);letter-spacing:-1px;margin:4px 10px 24px}
+.nav{display:grid;gap:10px}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:2px solid transparent;background:transparent;color:var(--muted);border-radius:18px;padding:13px 14px;font-weight:900;font-size:16px;cursor:pointer}
+.nav button:hover{background:var(--soft);color:var(--text)}
+.nav button.active{background:var(--soft);border-color:var(--green);color:var(--green)}
+.navIcon{font-size:21px;width:26px;text-align:center}
+.content{padding:24px 5vw 60px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+.status{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:9px 13px;font-weight:900;color:var(--text)}
+.badge.green{color:var(--green)}
+.badge.blue{color:var(--blue)}
+button{font:inherit;border:0;background:var(--card);color:var(--text);border:2px solid var(--line);border-radius:16px;padding:11px 15px;font-weight:900;cursor:pointer;transition:.12s}
+button:hover{transform:translateY(-1px)}
+button.primary{background:var(--green);border-color:var(--green2);color:white;box-shadow:0 5px 0 var(--green2)}
+button.primary:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green2)}
+button.blue{background:var(--blue);border-color:#0b8fd0;color:white;box-shadow:0 5px 0 #0b8fd0}
+button.yellow{background:var(--yellow);border-color:#d6a900;color:#3a2b00;box-shadow:0 5px 0 #d6a900}
+button.red{background:var(--red);border-color:#c93232;color:white;box-shadow:0 5px 0 #c93232}
+.page{display:none}
+.page.active{display:block}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:22px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:28px;box-shadow:var(--shadow)}
+.pad{padding:26px}
+.kicker{font-size:13px;font-weight:950;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+h1{font-size:clamp(40px,6vw,72px);line-height:.95;letter-spacing:-2.5px;margin-bottom:14px}
+h2{font-size:30px;margin-bottom:14px;letter-spacing:-.8px}
+h3{font-size:20px;margin-bottom:7px}
+p{color:var(--muted);line-height:1.65}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stat{background:var(--bg);border:2px solid var(--line);border-radius:22px;padding:18px}
+.stat b{display:block;font-size:34px;color:var(--green);line-height:1}
+.stat small{font-weight:900;color:var(--muted)}
+.progress{height:18px;background:var(--bg);border:2px solid var(--line);border-radius:999px;overflow:hidden;margin-top:16px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--yellow));border-radius:999px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.lesson,.unit,.exo,.player{padding:20px;cursor:pointer}
+.lesson:hover,.unit:hover,.exo:hover{border-color:var(--green)}
+.tag{display:inline-flex;margin-top:12px;border-radius:999px;background:var(--soft);color:var(--green);padding:7px 11px;font-size:12px;font-weight:950}
+.path{display:grid;gap:16px;max-width:780px;margin:auto}
+.unit{display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:14px}
+.bubble{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:white;font-size:25px;font-weight:950;box-shadow:0 6px 0 var(--green2)}
+.bubble.blue{background:var(--blue);box-shadow:0 6px 0 #0b8fd0}
+.bubble.yellow{background:var(--yellow);box-shadow:0 6px 0 #d6a900;color:#3a2b00}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+input,select{font:inherit;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px 14px;color:var(--text);font-weight:800;outline:none}
+input{flex:1;min-width:220px}
+input:focus,select:focus{border-color:var(--green)}
+.quiz{display:grid;grid-template-columns:.9fr 1.1fr;gap:20px}
+.list{display:grid;gap:12px;max-height:610px;overflow:auto;padding-right:4px}
+.question{font-size:27px;font-weight:950;letter-spacing:-.7px;line-height:1.2;margin:12px 0 16px}
+.answers{display:grid;gap:12px}
+.answer{text-align:left;border-radius:18px;padding:16px;background:var(--card)}
+.answer.ok{background:#d7ffb8;border-color:var(--green);color:#245800}
+.answer.no{background:#ffd6d6;border-color:var(--red);color:#7a1010}
+[data-theme=dark] .answer.ok{background:#213f18;color:#d9ffc8}
+[data-theme=dark] .answer.no{background:#461c1c;color:#ffe2e2}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:center;z-index:100;padding:18px}
+.modal.show{display:grid}
+.box{max-width:850px;width:100%;max-height:88vh;overflow:auto;background:var(--card);border:2px solid var(--line);border-radius:28px;box-shadow:0 12px 0 rgba(0,0,0,.18);padding:24px}
+.boxTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+ul{padding-left:22px;color:var(--muted);line-height:1.65}
+li{margin:7px 0}
+.checklist{display:grid;gap:11px}
+.check{display:flex;align-items:flex-start;gap:12px;background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:13px;font-weight:800;color:var(--text)}
+.check input{min-width:auto;margin-top:4px;accent-color:var(--green)}
+.mobileTitle{display:none}
+.accountBox{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.lobbyCode{font-size:42px;font-weight:950;color:var(--green);letter-spacing:3px}
+.player{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px}
+.small{font-size:13px;color:var(--muted);font-weight:800}
+@media(max-width:900px){.app{display:block}.sidebar{position:static;height:auto;border-right:0;border-bottom:2px solid var(--line)}.brand{display:none}.mobileTitle{display:block;font-size:30px;font-weight:950;color:var(--green)}.nav{display:flex;overflow:auto}.nav button{min-width:max-content}.content{padding:18px}.hero,.quiz,.accountBox{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.unit{grid-template-columns:52px 1fr}.unit button{display:none}h1{font-size:42px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand">FRrevis</div>
+<div class="nav">
+<button class="active" data-page="home"><span class="navIcon">🏠</span>Accueil</button>
+<button data-page="account"><span class="navIcon">👤</span>Compte</button>
+<button data-page="path"><span class="navIcon">🛤️</span>Parcours</button>
+<button data-page="fr"><span class="navIcon">📘</span>Français</button>
+<button data-page="math"><span class="navIcon">🔢</span>Maths</button>
+<button data-page="train"><span class="navIcon">🎯</span>Solo</button>
+<button data-page="multi"><span class="navIcon">⚔️</span>Défis</button>
+</div>
+</aside>
+<main class="content">
+<div class="topbar">
+<div class="mobileTitle">FRrevis</div>
+<div class="status">
+<div class="badge green">🔥 <span id="streak">0</span> série</div>
+<div class="badge blue">⭐ <span id="score">0</span> xp</div>
+<div class="badge">✅ <span id="done">0%</span></div>
+</div>
+<div class="actions" style="margin:0">
+<button onclick="openHelp()">Aide</button>
+<button onclick="toggleTheme()" id="themeBtn">Sombre</button>
+</div>
+</div>
+<section class="page active" id="home">
+<div class="hero">
+<div class="card pad">
+<div class="kicker">Objectif brevet</div>
+<h1>Révise comme un jeu.</h1>
+<p>Compte, sauvegarde en ligne, solo et défis avec code de lobby pour affronter tes amis sur les questions du brevet.</p>
+<div class="actions">
+<button class="primary" onclick="go('account')">Connexion</button>
+<button class="blue" onclick="go('multi')">Défier un ami</button>
+<button onclick="go('path')">Parcours</button>
+</div>
+</div>
+<div class="card pad">
+<h2>Progression</h2>
+<div class="stats">
+<div class="stat"><b id="homeScore">0</b><small>xp gagnés</small></div>
+<div class="stat"><b id="homeStreak">0</b><small>série actuelle</small></div>
+<div class="stat"><b id="homeDone">0%</b><small>exercices vus</small></div>
+<div class="stat"><b id="homeReady">0%</b><small>prêt brevet</small></div>
+</div>
+<div class="progress"><div class="bar" id="mainBar"></div></div>
+</div>
+</div>
+<div class="grid" style="margin-top:22px">
+<div class="card pad"><h3>Solo</h3><p>Réponds aux questions, gagne de l’xp et sauvegarde ton score sur ton compte.</p></div>
+<div class="card pad"><h3>Défis</h3><p>Crée un lobby, partage le code, lance la partie et tout le monde reçoit la même question.</p></div>
+<div class="card pad"><h3>Brevet</h3><p>Français, maths, méthodes, astuces et questions mélangées pour t’entraîner sérieusement.</p></div>
+</div>
+</section>
+<section class="page" id="account">
+<div class="accountBox">
+<div class="card pad" id="loginCard">
+<h2>Connexion</h2>
+<p>Connecte-toi avec email/password ou Google pour sauvegarder ton score et jouer en multi.</p>
+<div class="controls"><input id="nameInput" placeholder="Pseudo"></div>
+<div class="controls"><input id="emailInput" placeholder="Email"></div>
+<div class="controls"><input id="passInput" type="password" placeholder="Mot de passe"></div>
+<div class="actions">
+<button class="primary" id="registerBtn">Créer compte</button>
+<button class="blue" id="loginBtn">Connexion</button>
+<button class="yellow" id="googleBtn">Google</button>
+</div>
+<p id="authMsg" style="margin-top:14px"></p>
+</div>
+<div class="card pad" id="profileCard">
+<h2>Profil</h2>
+<p id="profileText">Pas connecté.</p>
+<div class="stats" style="margin-top:16px">
+<div class="stat"><b id="profileXp">0</b><small>xp</small></div>
+<div class="stat"><b id="profileDone">0</b><small>exercices</small></div>
+</div>
+<div class="actions"><button class="red" id="logoutBtn">Déconnexion</button><button onclick="syncUser()">Sauvegarder maintenant</button></div>
+</div>
+</div>
+</section>
+<section class="page" id="path">
+<div class="card pad" style="margin-bottom:18px">
+<h2>Parcours brevet</h2>
+<p>Fais les étapes dans l’ordre. Chaque carte ouvre les leçons ou exercices utiles.</p>
+</div>
+<div class="path" id="pathList"></div>
+<div class="card pad" style="margin-top:18px">
+<h2>Checklist prêt brevet</h2>
+<div class="checklist" id="checklist"></div>
+</div>
+</section>
+<section class="page" id="fr">
+<div class="card pad">
+<h2>Français</h2>
+<p>Leçons courtes pour les questions de compréhension, grammaire, orthographe, conjugaison et rédaction.</p>
+<div class="controls">
+<input id="frSearch" placeholder="Chercher une leçon..." oninput="renderLessons()">
+<select id="frCat" onchange="renderLessons()"><option value="all">Tout</option><option>Grammaire</option><option>Orthographe</option><option>Conjugaison</option><option>Vocabulaire</option><option>Compréhension</option><option>Rédaction</option></select>
+</div>
+</div>
+<div class="grid" id="frLessons" style="margin-top:16px"></div>
+</section>
+<section class="page" id="math">
+<div class="card pad">
+<h2>Maths</h2>
+<p>Tout le plus utile pour la 3e: calcul, équations, fonctions, géométrie, statistiques, probabilités et algorithmique.</p>
+<div class="controls">
+<input id="mathSearch" placeholder="Chercher une leçon..." oninput="renderLessons()">
+<select id="mathCat" onchange="renderLessons()"><option value="all">Tout</option><option>Nombres</option><option>Calcul</option><option>Équations</option><option>Fonctions</option><option>Géométrie</option><option>Stats probas</option><option>Algo</option></select>
+</div>
+</div>
+<div class="grid" id="mathLessons" style="margin-top:16px"></div>
+</section>
+<section class="page" id="train">
+<div class="quiz">
+<div class="card pad">
+<h2>Solo</h2>
+<p>Choisis un thème ou lance une question aléatoire.</p>
+<div class="controls">
+<select id="sub" onchange="renderExercises()"><option value="all">Tout</option><option>Français</option><option>Maths</option></select>
+<select id="lvl" onchange="renderExercises()"><option value="all">Tous niveaux</option><option>Facile</option><option>Moyen</option><option>Difficile</option></select>
+<button class="primary" onclick="randomQuestion()">Aléatoire</button>
+</div>
+<div class="list" id="exerciseList"></div>
+</div>
+<div class="card pad">
+<div class="kicker" id="qMeta">Exercice</div>
+<div class="question" id="qText">Choisis une question à gauche.</div>
+<div class="answers" id="answers"></div>
+<p id="feedback" style="margin-top:14px"></p>
+</div>
+</div>
+</section>
+<section class="page" id="multi">
+<div class="quiz">
+<div class="card pad">
+<h2>Défis multijoueur</h2>
+<p>Connecte-toi, crée un lobby, partage le code, puis lance la partie.</p>
+<div class="actions">
+<button class="primary" id="createLobbyBtn">Créer lobby</button>
+<input id="joinCode" placeholder="Code lobby">
+<button class="blue" id="joinLobbyBtn">Rejoindre</button>
+</div>
+<div style="margin-top:18px">
+<div class="small">Code du lobby</div>
+<div class="lobbyCode" id="lobbyCode">----</div>
+<p id="lobbyStatus">Aucun lobby.</p>
+<div class="actions">
+<button class="primary" id="startLobbyBtn">Lancer</button>
+<button class="yellow" id="nextRoundBtn">Question suivante</button>
+<button class="red" id="leaveLobbyBtn">Quitter</button>
+</div>
+</div>
+<h3 style="margin-top:22px">Joueurs</h3>
+<div class="list" id="playersList"></div>
+</div>
+<div class="card pad">
+<div class="kicker" id="mMeta">Défi</div>
+<div class="question" id="mText">Crée ou rejoins un lobby.</div>
+<div class="answers" id="mAnswers"></div>
+<p id="mFeedback" style="margin-top:14px"></p>
+</div>
+</div>
+</section>
+</main>
+</div>
+<div class="modal" id="modal">
+<div class="box">
+<div class="boxTop"><h2 id="modalTitle">Aide</h2><button onclick="closeModal()">Fermer</button></div>
+<div id="modalBody"></div>
+</div>
+</div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import{getAuth,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,signInWithPopup,signOut,onAuthStateChanged,updateProfile}from"https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+import{getFirestore,doc,setDoc,getDoc,updateDoc,onSnapshot,serverTimestamp,collection,deleteDoc,runTransaction}from"https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyCx4ZzMJ39slz-aRZW44JehmZF0qFUJyrA",authDomain:"frrevis.firebaseapp.com",projectId:"frrevis",storageBucket:"frrevis.firebasestorage.app",messagingSenderId:"200695947087",appId:"1:200695947087:web:c4c042d93ab15f6d8a2f3a",measurementId:"G-CEDJ789PHK"};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const $=x=>document.querySelector(x);
+const $$=x=>document.querySelectorAll(x);
+const st={score:+localStorage.FRscore||0,streak:+localStorage.FRstreak||0,done:JSON.parse(localStorage.FRdone||"[]"),checks:JSON.parse(localStorage.FRchecks||"{}"),theme:localStorage.FRtheme||"light",user:null,lobby:null,players:[],unsubLobby:null,unsubPlayers:null,answeredRound:null};
+document.documentElement.dataset.theme=st.theme;
+$("#themeBtn").textContent=st.theme=="dark"?"Clair":"Sombre";
+const lessons=[
+["Français","Grammaire","Nature et fonction","La nature dit ce qu’est un mot: nom, verbe, adjectif, pronom. La fonction dit son rôle: sujet, COD, COI, attribut.","Astuce: nature = identité du mot, fonction = métier dans la phrase."],
+["Français","Grammaire","Sujet, COD, COI","Le sujet fait l’action. Le COD répond à qui ou quoi. Le COI répond à à qui, à quoi, de qui, de quoi.","Astuce: COD direct, COI avec une préposition."],
+["Français","Grammaire","Phrase simple et complexe","Une phrase simple a un seul verbe conjugué. Une phrase complexe en a plusieurs.","Astuce: compte les verbes conjugués avant de répondre."],
+["Français","Orthographe","Participe passé","Avec être, accord avec le sujet. Avec avoir, accord avec le COD s’il est placé avant.","Astuce: être = sujet, avoir = regarde si le COD est avant."],
+["Français","Orthographe","Homophones","a/à, et/est, son/sont, ces/ses se choisissent avec le sens et les remplacements.","Astuce: a devient avait, est devient était."],
+["Français","Conjugaison","Temps du récit","L’imparfait décrit ou exprime l’habitude. Le passé simple raconte les actions principales.","Astuce: décor = imparfait, action qui avance = passé simple."],
+["Français","Vocabulaire","Figures de style","Comparaison, métaphore, hyperbole, personnification, anaphore et antithèse créent des effets.","Astuce: nomme la figure puis explique l’effet."],
+["Français","Compréhension","Répondre avec citation","Une réponse solide donne une idée, cite le texte, puis explique la citation.","Astuce: idée, citation, explication."],
+["Français","Rédaction","Sujet de réflexion","Il faut une introduction, des arguments, des exemples et une conclusion.","Astuce: un paragraphe = une idée."],
+["Maths","Nombres","Fractions","Pour additionner, on met au même dénominateur. Pour multiplier, on multiplie haut avec haut et bas avec bas.","Astuce: addition = même dénominateur, multiplication = direct."],
+["Maths","Nombres","Puissances","Les puissances servent aux multiplications répétées et à l’écriture scientifique.","Astuce: même base en multiplication, on additionne les exposants."],
+["Maths","Calcul","Développer","Développer transforme un produit en somme avec la distributivité.","Astuce: a(b+c)=ab+ac."],
+["Maths","Calcul","Factoriser","Factoriser transforme une somme en produit grâce à un facteur commun.","Astuce: cherche ce qui se répète."],
+["Maths","Équations","Premier degré","On isole l’inconnue en faisant la même opération des deux côtés.","Astuce: même opération à gauche et à droite."],
+["Maths","Fonctions","Fonction affine","Une fonction affine est de la forme f(x)=ax+b.","Astuce: a dirige la droite, b est le départ."],
+["Maths","Fonctions","Proportionnalité","Deux grandeurs sont proportionnelles si on multiplie toujours par le même nombre.","Astuce: tableau propre puis produit en croix."],
+["Maths","Géométrie","Pythagore","Dans un triangle rectangle, hypoténuse² = côté² + côté².","Astuce: rectangle obligatoire."],
+["Maths","Géométrie","Thalès","Avec des droites parallèles, certaines longueurs sont proportionnelles.","Astuce: parallèles d’abord, rapports ensuite."],
+["Maths","Géométrie","Trigonométrie","Dans un triangle rectangle, cos, sin et tan relient angles et côtés.","Astuce: CAH SOH TOA."],
+["Maths","Stats probas","Probabilités","Une probabilité vaut cas favorables divisés par cas possibles.","Astuce: favorable / possible."],
+["Maths","Algo","Algorithmique","Un algorithme utilise variables, conditions et boucles.","Astuce: si = condition, répéter = boucle."]
+];
+const q=[];
+function add(s,c,l,t,a,r,h){q.push({id:q.length+1,s,c,l,t,a,r,h})}
+const raw=[
+["Français","Grammaire","Facile","Dans “Le chat dort”, “Le chat” est...",["Sujet","COD","COI","Attribut"],0,"Il fait l’action."],
+["Français","Grammaire","Facile","Dans “Je mange une pomme”, “une pomme” est...",["Sujet","COD","COI","Attribut"],1,"Je mange quoi? une pomme."],
+["Français","Grammaire","Moyen","Une phrase complexe contient...",["Plusieurs verbes conjugués","Aucun verbe","Un seul mot","Toujours un dialogue"],0,"Complexe = plusieurs propositions."],
+["Français","Orthographe","Facile","Choisis la bonne phrase.",["Il a faim","Il à faim","Il as faim","Il ah faim"],0,"a peut devenir avait."],
+["Français","Orthographe","Moyen","Les fleurs que j’ai...",["cueilli","cueillies","cueillis","cueillir"],1,"COD avant = accord."],
+["Français","Conjugaison","Facile","“Il marchait” est à...",["Présent","Imparfait","Futur","Passé simple"],1,"Terminaison -ait."],
+["Français","Conjugaison","Moyen","Le passé simple sert surtout à...",["Décrire","Faire avancer l’action","Dire une habitude","Donner un ordre"],1,"C’est le temps des actions principales."],
+["Français","Vocabulaire","Facile","“Fort comme un lion” est une...",["Comparaison","Métaphore","Hyperbole","Anaphore"],0,"Comme est un outil de comparaison."],
+["Français","Vocabulaire","Moyen","“Je meurs de faim” est une...",["Hyperbole","Litote","Oxymore","Anaphore"],0,"C’est une exagération."],
+["Français","Compréhension","Facile","Pour justifier, il faut...",["Citer le texte","Inventer","Répondre oui","Faire un calcul"],0,"La citation prouve."],
+["Français","Compréhension","Moyen","Un champ lexical est...",["Des mots autour d’un thème","Une faute","Un temps","Un paragraphe"],0,"Les mots ont un thème commun."],
+["Français","Rédaction","Facile","Une bonne réponse doit être...",["Une phrase complète","Un mot seul","Un emoji","Une abréviation"],0,"Au brevet, il faut rédiger."],
+["Français","Rédaction","Moyen","Un paragraphe argumentatif contient...",["Idée argument exemple","Seulement citation","Seulement dialogue","Titre prénom date"],0,"C’est la base."],
+["Maths","Nombres","Facile","3² vaut...",["6","9","12","8"],1,"3×3=9."],
+["Maths","Nombres","Facile","6/12 se simplifie en...",["1/2","2/3","3/4","6"],0,"Divise par 6."],
+["Maths","Nombres","Moyen","45000 en écriture scientifique:",["4,5×10⁴","45×10³","4,5×10³","0,45×10⁴"],0,"Il faut un nombre entre 1 et 10."],
+["Maths","Calcul","Facile","Développe 3(x+2).",["3x+2","3x+6","x+6","6x"],1,"Distribue 3."],
+["Maths","Calcul","Moyen","Développe (x+4)(x+1).",["x²+5x+4","x²+4","x²+x+4","2x+5"],0,"x²+x+4x+4."],
+["Maths","Équations","Facile","Résous x+7=12.",["5","19","7","12"],0,"x=12-7."],
+["Maths","Équations","Moyen","Résous 2x+5=17.",["6","11","12","5"],0,"2x=12."],
+["Maths","Fonctions","Facile","Si f(x)=2x, f(5) vaut...",["7","10","25","3"],1,"2×5."],
+["Maths","Fonctions","Moyen","Dans f(x)=5x-7, le coefficient directeur est...",["5","-7","x","12"],0,"a=5."],
+["Maths","Géométrie","Facile","Le plus grand côté d’un triangle rectangle est...",["Hypoténuse","Médiane","Rayon","Hauteur"],0,"Opposé à l’angle droit."],
+["Maths","Géométrie","Moyen","La réciproque de Pythagore prouve qu’un triangle est...",["Rectangle","Isocèle","Équilatéral","Plat"],0,"Si a²+b²=c²."],
+["Maths","Stats probas","Facile","Moyenne de 10,12,14:",["10","12","14","36"],1,"36/3."],
+["Maths","Stats probas","Moyen","Médiane de 2,5,9:",["2","5","9","16"],1,"Valeur centrale."],
+["Maths","Algo","Facile","Une variable sert à...",["Stocker une valeur","Effacer","Colorer","Diviser seulement"],0,"Elle garde une info."],
+["Maths","Algo","Moyen","Si x=5 puis x=x+2, x vaut...",["5","2","7","10"],2,"5+2."]
+];
+raw.forEach(x=>add(...x));
+while(q.length<100){let b=raw[q.length%raw.length];add(b[0],b[1],b[2],b[3],b[4],b[5],b[6])}
+const checks=["Je sais répondre avec une citation.","Je connais sujet, COD, COI et attribut.","Je connais imparfait, passé simple et présent.","Je sais reconnaître comparaison, métaphore et hyperbole.","Je sais développer et factoriser.","Je sais résoudre une équation simple.","Je sais utiliser Pythagore et Thalès.","Je sais calculer moyenne, médiane et probabilité.","Je fais attention aux unités en maths.","J’ai fait un défi multi."];
+const path=[
+["📘","Français langue","Grammaire, orthographe, conjugaison","fr","green"],
+["✍️","Compréhension","Citer, expliquer, analyser","fr","blue"],
+["🧠","Rédaction","Réflexion et imagination","fr","yellow"],
+["🔢","Maths bases","Fractions, puissances, calcul","math","green"],
+["📈","Fonctions équations","Méthodes qui tombent souvent","math","blue"],
+["📐","Géométrie","Pythagore, Thalès, trigo","math","yellow"],
+["🎯","Solo","Questions rapides","train","green"],
+["⚔️","Défis","Lobby avec code","multi","blue"]
+];
+let current=null,locked=false;
+function saveLocal(){localStorage.FRscore=st.score;localStorage.FRstreak=st.streak;localStorage.FRdone=JSON.stringify(st.done);localStorage.FRchecks=JSON.stringify(st.checks);localStorage.FRtheme=st.theme;updateStats()}
+async function syncUser(){if(!st.user)return;await setDoc(doc(db,"users",st.user.uid),{uid:st.user.uid,name:st.user.displayName||"Joueur",email:st.user.email||"",xp:st.score,streak:st.streak,done:st.done,checks:st.checks,updatedAt:serverTimestamp()},{merge:true});$("#authMsg").textContent="Sauvegardé."}
+async function loadCloudUser(user){let ref=doc(db,"users",user.uid);let snap=await getDoc(ref);if(snap.exists()){let d=snap.data();st.score=Math.max(st.score,d.xp||0);st.streak=Math.max(st.streak,d.streak||0);st.done=[...new Set([...(st.done||[]),...(d.done||[])])];st.checks={...(d.checks||{}),...st.checks}}await syncUser();saveLocal()}
+function updateStats(){let d=Math.round(st.done.length/q.length*100);let r=Math.round(checks.filter((_,i)=>st.checks[i]).length/checks.length*100);$("#score").textContent=st.score;$("#streak").textContent=st.streak;$("#done").textContent=d+"%";$("#homeScore").textContent=st.score;$("#homeStreak").textContent=st.streak;$("#homeDone").textContent=d+"%";$("#homeReady").textContent=r+"%";$("#mainBar").style.width=Math.round((d+r)/2)+"%";$("#profileXp").textContent=st.score;$("#profileDone").textContent=st.done.length}
+function go(id){$$(".page").forEach(x=>x.classList.remove("active"));$("#"+id).classList.add("active");$$(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page==id))}
+$$(".nav button").forEach(b=>b.onclick=()=>go(b.dataset.page));
+window.go=go;
+window.toggleTheme=()=>{st.theme=st.theme=="dark"?"light":"dark";document.documentElement.dataset.theme=st.theme;$("#themeBtn").textContent=st.theme=="dark"?"Clair":"Sombre";saveLocal()};
+window.openHelp=()=>{let active=$(".page.active").id;let list=active=="multi"?["Un joueur crée le lobby et partage le code.","L’hôte clique sur Lancer puis Question suivante.","Tout le monde répond à la même question.","Le classement se met à jour en temps réel."]:active=="math"?["CAH SOH TOA pour la trigonométrie.","Pythagore seulement dans un triangle rectangle.","Pour les équations, même opération des deux côtés."]:active=="fr"?["Réponse brevet: idée + citation + explication.","a devient avait, est devient était.","Imparfait = décor, passé simple = action."]:["Connecte-toi pour sauvegarder en ligne.","Travaille par petites séries de 5 questions.","Corrige tes erreurs tout de suite."];$("#modalTitle").textContent="Aide et astuces";$("#modalBody").innerHTML=`<ul>${list.map(x=>`<li>${x}</li>`).join("")}</ul><div class="actions"><button class="primary" onclick="go('train');closeModal()">Faire une question</button><button onclick="go('multi');closeModal()">Défi multi</button></div>`;$("#modal").classList.add("show")};
+window.closeModal=()=>$("#modal").classList.remove("show");
+function renderPath(){$("#pathList").innerHTML=path.map(x=>`<div class="card unit" onclick="go('${x[3]}')"><div class="bubble ${x[4]}">${x[0]}</div><div><h3>${x[1]}</h3><p>${x[2]}</p></div><button>Ouvrir</button></div>`).join("");$("#checklist").innerHTML=checks.map((x,i)=>`<label class="check"><input type="checkbox" ${st.checks[i]?"checked":""} onchange="st.checks[${i}]=this.checked;saveLocal();syncUser()"><span>${x}</span></label>`).join("")}
+function lessonCard(x,i){return `<div class="card lesson" onclick="openLesson(${i})"><h3>${x[2]}</h3><p>${x[3]}</p><span class="tag">${x[0]} • ${x[1]}</span></div>`}
+window.renderLessons=()=>{let fs=$("#frSearch")?.value.toLowerCase()||"",fc=$("#frCat")?.value||"all",ms=$("#mathSearch")?.value.toLowerCase()||"",mc=$("#mathCat")?.value||"all";$("#frLessons").innerHTML=lessons.filter(x=>x[0]=="Français"&&(fc=="all"||x[1]==fc)&&x.join(" ").toLowerCase().includes(fs)).map(x=>lessonCard(x,lessons.indexOf(x))).join("");$("#mathLessons").innerHTML=lessons.filter(x=>x[0]=="Maths"&&(mc=="all"||x[1]==mc)&&x.join(" ").toLowerCase().includes(ms)).map(x=>lessonCard(x,lessons.indexOf(x))).join("")};
+window.openLesson=i=>{let x=lessons[i];$("#modalTitle").textContent=x[2];$("#modalBody").innerHTML=`<p>${x[3]}</p><div class="card pad" style="margin-top:14px;box-shadow:none"><h3>Astuce</h3><p>${x[4]}</p></div><div class="actions"><button class="primary" onclick="go('train');closeModal()">M’entraîner</button><button onclick="closeModal()">J’ai compris</button></div>`;$("#modal").classList.add("show")};
+function filtered(){let s=$("#sub").value,l=$("#lvl").value;return q.filter(x=>(s=="all"||x.s==s)&&(l=="all"||x.l==l))}
+window.renderExercises=()=>{$("#exerciseList").innerHTML=filtered().map(x=>`<div class="card exo" onclick="loadQ(${x.id})"><h3>#${x.id} ${x.s}</h3><p>${x.t}</p><span class="tag">${x.c} • ${x.l}</span></div>`).join("")};
+window.loadQ=id=>{go("train");current=q.find(x=>x.id==id);locked=false;$("#qMeta").textContent=current.s+" • "+current.c+" • "+current.l;$("#qText").textContent=current.t;$("#feedback").textContent="";$("#answers").innerHTML=current.a.map((x,i)=>`<button class="answer" onclick="answer(${i})">${x}</button>`).join("")};
+window.randomQuestion=()=>{let arr=filtered();window.loadQ(arr[Math.floor(Math.random()*arr.length)].id)};
+window.answer=i=>{if(locked||!current)return;locked=true;$$("#answers .answer").forEach((b,n)=>{if(n==current.r)b.classList.add("ok");if(n==i&&i!=current.r)b.classList.add("no")});if(i==current.r){st.score+=10;st.streak++;if(!st.done.includes(current.id))st.done.push(current.id);$("#feedback").textContent="Bien joué. "+current.h}else{st.streak=0;$("#feedback").textContent="Pas grave. "+current.h}saveLocal();syncUser()};
+function nameOfUser(){return st.user?.displayName||$("#nameInput").value.trim()||"Joueur"}
+$("#registerBtn").onclick=async()=>{try{let email=$("#emailInput").value.trim(),pass=$("#passInput").value.trim(),name=$("#nameInput").value.trim()||"Joueur";let res=await createUserWithEmailAndPassword(auth,email,pass);await updateProfile(res.user,{displayName:name});st.user=res.user;await syncUser();$("#authMsg").textContent="Compte créé."}catch(e){$("#authMsg").textContent=e.message}};
+$("#loginBtn").onclick=async()=>{try{await signInWithEmailAndPassword(auth,$("#emailInput").value.trim(),$("#passInput").value.trim());$("#authMsg").textContent="Connecté."}catch(e){$("#authMsg").textContent=e.message}};
+$("#googleBtn").onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider());$("#authMsg").textContent="Connecté avec Google."}catch(e){$("#authMsg").textContent=e.message}};
+$("#logoutBtn").onclick=async()=>{await signOut(auth)};
+onAuthStateChanged(auth,async user=>{st.user=user;if(user){$("#profileText").textContent=`Connecté: ${user.displayName||"Joueur"} • ${user.email||""}`;await loadCloudUser(user)}else{$("#profileText").textContent="Pas connecté.";$("#authMsg").textContent="Déconnecté."}updateStats()});
+function lobbyId(){return Math.random().toString(36).slice(2,6).toUpperCase()}
+function cleanLobbySubs(){if(st.unsubLobby)st.unsubLobby();if(st.unsubPlayers)st.unsubPlayers();st.unsubLobby=null;st.unsubPlayers=null}
+async function enterLobby(code){cleanLobbySubs();st.lobby=code;$("#lobbyCode").textContent=code;let uid=st.user.uid;await setDoc(doc(db,"lobbies",code,"players",uid),{uid,name:nameOfUser(),score:0,answeredRound:-1,joinedAt:serverTimestamp()},{merge:true});st.unsubLobby=onSnapshot(doc(db,"lobbies",code),snap=>{if(!snap.exists()){leaveLobby(false);return}renderLobby(snap.data())});st.unsubPlayers=onSnapshot(collection(db,"lobbies",code,"players"),snap=>{st.players=snap.docs.map(d=>d.data()).sort((a,b)=>(b.score||0)-(a.score||0));renderPlayers()})}
+$("#createLobbyBtn").onclick=async()=>{if(!st.user){go("account");return}let code=lobbyId();await setDoc(doc(db,"lobbies",code),{code,hostUid:st.user.uid,hostName:nameOfUser(),status:"waiting",round:0,total:20,questionIds:[],createdAt:serverTimestamp()});await enterLobby(code)};
+$("#joinLobbyBtn").onclick=async()=>{if(!st.user){go("account");return}let code=$("#joinCode").value.trim().toUpperCase();if(!code)return;let snap=await getDoc(doc(db,"lobbies",code));if(!snap.exists()){$("#lobbyStatus").textContent="Lobby introuvable.";return}await enterLobby(code)};
+$("#startLobbyBtn").onclick=async()=>{if(!st.user||!st.lobby)return;let ref=doc(db,"lobbies",st.lobby);let snap=await getDoc(ref);if(!snap.exists()||snap.data().hostUid!=st.user.uid)return;let ids=[...q].sort(()=>Math.random()-.5).slice(0,20).map(x=>x.id);await updateDoc(ref,{status:"playing",round:0,total:20,questionIds:ids,startedAt:serverTimestamp()})};
+$("#nextRoundBtn").onclick=async()=>{if(!st.user||!st.lobby)return;let ref=doc(db,"lobbies",st.lobby);let snap=await getDoc(ref);if(!snap.exists()||snap.data().hostUid!=st.user.uid)return;let d=snap.data(),next=(d.round||0)+1;if(next>=d.questionIds.length){await updateDoc(ref,{status:"finished"});return}await updateDoc(ref,{round:next})};
+$("#leaveLobbyBtn").onclick=()=>leaveLobby(true);
+async function leaveLobby(remove){if(st.user&&st.lobby&&remove)await deleteDoc(doc(db,"lobbies",st.lobby,"players",st.user.uid));cleanLobbySubs();st.lobby=null;st.players=[];$("#lobbyCode").textContent="----";$("#lobbyStatus").textContent="Aucun lobby.";$("#playersList").innerHTML="";$("#mMeta").textContent="Défi";$("#mText").textContent="Crée ou rejoins un lobby.";$("#mAnswers").innerHTML="";$("#mFeedback").textContent=""}
+function renderPlayers(){$("#playersList").innerHTML=st.players.map((p,i)=>`<div class="card player"><div><h3>${i+1}. ${p.name||"Joueur"}</h3><p>${p.uid==st.user?.uid?"toi":"adversaire"} ${p.answeredRound==st.currentRound?"• a répondu":""}</p></div><div class="badge blue">${p.score||0}</div></div>`).join("")}
+function renderLobby(l){st.currentRound=l.round;let isHost=st.user&&l.hostUid==st.user.uid;$("#lobbyStatus").textContent=isHost?`Tu es l’hôte • ${l.status}`:`Hôte: ${l.hostName||"Joueur"} • ${l.status}`;if(l.status=="waiting"){$("#mMeta").textContent="En attente";$("#mText").textContent="Partage le code avec tes amis puis l’hôte lance la partie.";$("#mAnswers").innerHTML="";$("#mFeedback").textContent="";renderPlayers();return}if(l.status=="finished"){let winner=st.players[0];$("#mMeta").textContent="Terminé";$("#mText").textContent=winner?`Gagnant: ${winner.name} avec ${winner.score} points`:"Partie terminée.";$("#mAnswers").innerHTML=`<button class="primary" onclick="window.location.reload()">Nouvelle session</button>`;$("#mFeedback").textContent="";st.checks[9]=true;saveLocal();syncUser();return}let id=l.questionIds[l.round],quest=q.find(x=>x.id==id);if(!quest)return;$("#mMeta").textContent=`Question ${l.round+1}/${l.questionIds.length} • ${quest.s} • ${quest.c}`;$("#mText").textContent=quest.t;let me=st.players.find(p=>p.uid==st.user?.uid);let answered=me&&me.answeredRound==l.round;$("#mAnswers").innerHTML=quest.a.map((a,i)=>`<button class="answer" ${answered?"disabled":""} onclick="multiAnswer(${i})">${a}</button>`).join("");$("#mFeedback").textContent=answered?"Tu as répondu. Attends la prochaine question.":"";renderPlayers()}
+window.multiAnswer=async i=>{if(!st.user||!st.lobby)return;let lobbyRef=doc(db,"lobbies",st.lobby);let playerRef=doc(db,"lobbies",st.lobby,"players",st.user.uid);await runTransaction(db,async tr=>{let lobbySnap=await tr.get(lobbyRef);let playerSnap=await tr.get(playerRef);if(!lobbySnap.exists()||!playerSnap.exists())return;let l=lobbySnap.data(),p=playerSnap.data();if(l.status!="playing"||p.answeredRound==l.round)return;let quest=q.find(x=>x.id==l.questionIds[l.round]);let gain=i==quest.r?10:0;tr.update(playerRef,{score:(p.score||0)+gain,answeredRound:l.round,lastAnswer:i,lastAnswerAt:serverTimestamp()});if(gain>0){st.score+=5;if(!st.done.includes(quest.id))st.done.push(quest.id)}});saveLocal();syncUser()};
+renderPath();
+window.renderLessons();
+window.renderExercises();
+updateStats();
+</script>
+</body>
+</html>
